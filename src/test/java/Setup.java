@@ -23,7 +23,7 @@ public class Setup {
     //Appium Server URL
     String appiumURL = "http://127.0.0.1:4723/wd/hub";
 
-    AppiumDriver<MobileElement> driver;
+    static AppiumDriver<MobileElement> driver;
     DesiredCapabilities caps;
     ExtentReports extent;
 
