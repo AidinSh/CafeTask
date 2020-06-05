@@ -3,18 +3,22 @@ import TestSteps.Search;
 import TestSteps.UserAuthentication;
 import com.aventstack.extentreports.ExtentTest;
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.TouchAction;
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 //Test Suite
 public class TestSuite extends Setup {
-    //Account
+    //User Credentials
     String username = "AidinSh";
     String password = "duma66641478";
 
-    @Test
-    public void SuccessfulLogin(){
+    @Test (priority = 0, enabled = true)
+    public void successfulLogin(){
         UserAuthentication userAuth = new UserAuthentication(driver);
 
         ExtentTest report = extent.createTest("Login Successfully", "Successful Login through Basic Authentication");
@@ -22,6 +26,7 @@ public class TestSuite extends Setup {
             userAuth.swipeChangeLog(report);
             userAuth.tapOnBasiAuth(report);
             userAuth.fillUserAndPass(report, username, password);
+            //Waiting for Server Response
             Thread.sleep(5000);
 
             //Validating that the user is logged in or not and make the report
@@ -42,8 +47,8 @@ public class TestSuite extends Setup {
 
     }
 
-    @Test
-    public void SuccessfulLogout(){
+    @Test (priority = 1, enabled = true)
+    public void successfulLogout(){
         UserAuthentication userAuth = new UserAuthentication(driver);
         ExtentTest report = extent.createTest("Logout Successfully", "Successful Logout");
         try {
@@ -52,7 +57,7 @@ public class TestSuite extends Setup {
             userAuth.tapOnLogout(report);
             userAuth.confirmLogout(report);
 
-            //Validating that the user is loggedout or not
+            //Validating that the user is logged out or not
             boolean isLoggedOut;
             try{
                 driver.findElementsById("com.fastaccess.github:id/basicAuth");
@@ -69,7 +74,7 @@ public class TestSuite extends Setup {
         }
     }
 
-    @Test
+    @Test (priority = 2, enabled = true)
     public void makeIssueSuccessfully(){
         UserAuthentication userAuth = new UserAuthentication(driver);
         Issue issue = new Issue(driver);
@@ -80,21 +85,43 @@ public class TestSuite extends Setup {
             userAuth.swipeChangeLog(report);
             userAuth.tapOnBasiAuth(report);
             userAuth.fillUserAndPass(report, username, password);
+            //Waiting for server response
             Thread.sleep(5000);
             search.fillSearchBox(report,"cafebazaar/Hop");
+            //Waiting for search results
             Thread.sleep(3000);
             search.chooseSearchResult(report, "cafebazaar/Hop");
             issue.tapOnRepoIssuesButton(report);
             issue.tapOnIssuesOptionsButton(report);
             issue.tapOnAddIssue(report);
-            issue.fillIssueFields(report, "Test3", "test3");
-            Thread.sleep(5000);
+            //Waiting for issue to be created
+            Thread.sleep(3000);
+            issue.fillIssueFields(report, "Test1", "test1");
+
+            //Validating that the issue is created and make the report
+            boolean isIssueCreated = false;
+            try{
+                List<MobileElement> titles = driver.findElementsById("com.fastaccess.github:id/title");
+                for(MobileElement element:titles){
+                    if(element.getText().equals("Test1")){
+                        report.pass("Issue Created");
+                        isIssueCreated = true;
+                        break;
+                    }else {
+                        report.fail("Issue is not created");
+                    }
+                }
+            }catch (NoSuchElementException e){
+                report.fail("Issue is not created");
+            }
+            Assert.assertTrue(isIssueCreated);
+
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    @Test
+    @Test (priority = 3, enabled = true)
     public void editIssue(){
         UserAuthentication userAuth = new UserAuthentication(driver);
         Issue issue = new Issue(driver);
@@ -103,13 +130,12 @@ public class TestSuite extends Setup {
         String newTitle = "Test5";
         String newDesc = "Test5 desc";
 
-        ExtentTest report = extent.createTest("Make Issue", "Successfully make an issue");
+        ExtentTest report = extent.createTest("Edit Issue", "Successfully Edit an issue");
 
         try{
-            userAuth.swipeChangeLog(report);
-            userAuth.tapOnBasiAuth(report);
-            userAuth.fillUserAndPass(report, username, password);
-            Thread.sleep(5000);
+            driver.navigate().back();
+            driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+            driver.navigate().back();
             issue.tapOnUserIssuesButton(report);
             issue.tapOnDesiredUserIssue(report, "Test1");
             issue.openEditUserIssue(report);
@@ -117,6 +143,7 @@ public class TestSuite extends Setup {
             MobileElement tvTitle = driver.findElementById("com.fastaccess.github:id/headerTitle");
             MobileElement tvDesc = driver.findElementById("com.fastaccess.github:id/comment");
 
+            //Validating that the issue is edited and make the report
             Assert.assertEquals(tvTitle.getText(), newTitle);
             Assert.assertEquals(tvDesc.getText(), newDesc);
 

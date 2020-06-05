@@ -6,6 +6,7 @@ import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Search {
     AppiumDriver<MobileElement> driver;
@@ -27,11 +28,15 @@ public class Search {
     public void chooseSearchResult(ExtentTest report, String phrase){
         List<MobileElement> searchList = driver.findElementsByClassName("android.widget.TextView");
         MobileElement tvResult = null;
-        for (MobileElement element:searchList){
-            if (element.getText().equals(phrase)){
-                tvResult = element;
-                break;
+        try {
+            for (MobileElement element : searchList) {
+                if (element.getText().equals(phrase)) {
+                    tvResult = element;
+                    break;
+                }
             }
+        }catch (NoSuchElementException e){
+            report.fatal("No Such Search Result!");
         }
         tvResult.click();
         report.log(Status.PASS, "Tap on desired search result");
