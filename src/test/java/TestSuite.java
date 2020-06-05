@@ -3,7 +3,6 @@ import TestSteps.Search;
 import TestSteps.UserAuthentication;
 import com.aventstack.extentreports.ExtentTest;
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.TouchAction;
 import org.openqa.selenium.NoSuchElementException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -14,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 //Test Suite
 public class TestSuite extends Setup {
     //User Credentials
-    String username = "AidinSh";
-    String password = "duma66641478";
+    String username = "username";
+    String password = "password";
 
     @Test (priority = 0, enabled = true)
     public void successfulLogin(){
